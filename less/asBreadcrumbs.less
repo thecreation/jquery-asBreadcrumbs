@@ -1,0 +1,28 @@
+.breadcrumb {
+    padding: 8px 15px;
+    margin-bottom: 20px;
+    list-style: none;
+    background-color: #f3f4f5;
+    border-radius: 3px;
+
+    > li {
+        display: inline-block;
+
+        + li:before {
+            content: "/\00a0";
+            padding: 0 5px;
+            color: #ccc;
+        }
+    }
+
+    &-dropdown,
+    &-ellipsis {
+        + li:before {
+            display: none;
+        }
+    }
+
+    &-menu {
+        display: none;
+    }
+}
