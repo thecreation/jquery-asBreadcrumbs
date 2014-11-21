@@ -47,10 +47,26 @@
                 <h3>Default</h3>
                 <pre class="has-example"><code class="language-markup"></code></pre>
                 <div class="example">
-                    <div class="breadcrumb-wrap">
-                    </div>
-                    <div class="breadcrumb-wrap">
-                    </div>
+                    <ol class="breadcrumb">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Getting Started</a></li>
+                        <li><a href="#">Library</a></li>
+                        <li><a href="#">Document</a></li>
+                        <li><a href="#">Components</a></li>
+                        <li><a href="#">JavaScript</a></li>
+                        <li><a href="#">Customize</a></li>
+                        <li class="active">Data</li>
+                    </ol>
+                    <ol class="breadcrumb" data-overflow="right">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Getting Started</a></li>
+                        <li><a href="#">Library</a></li>
+                        <li><a href="#">Document</a></li>
+                        <li><a href="#">Components</a></li>
+                        <li><a href="#">JavaScript</a></li>
+                        <li><a href="#">Customize</a></li>
+                        <li class="active">Data</li>
+                    </ol>
                 </div>
             </section>
         </section>
@@ -61,7 +77,7 @@
             (function(){
                 $('#toc').toc();
             })();
-            $('.breadcrumb-wrap').asBreadcrumbs({
+            $('.breadcrumb').asBreadcrumbs({
                 namespace: 'breadcrumb'
             });
         });
