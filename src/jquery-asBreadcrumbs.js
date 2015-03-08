@@ -37,6 +37,7 @@
             this.createDropList = false;
             this.childrenWithWidths = [];
             this.current = 0;
+            this.dropdownWidth = 0;
 
             var children = this.options.getItem(this.$element);
             children.each(function() {
@@ -46,10 +47,12 @@
 
             this.$element.addClass(this.namespace + '-' + this.options.overflow);
 
+            this.createDropdown();
+            this.deleteDropdown();
             this.calculate();
 
             if (this.options.responsive) {
-                $(window).on('resize', this._throttle(function(){
+                $(window).on('resize', this._throttle(function() {
                     self.resize.call(self);
                 }, 250));
             }
@@ -90,13 +93,11 @@
             if (this.createDropList === true) {
                 return;
             }
-            var html = [];
             var dropdown = this.options.dropdown();
             this.$dropdownWrap = this.$element.children().eq(0).clone().removeClass().addClass(this.namespace + '-dropdown').html(dropdown);
 
             if (this.options.ellipsis) {
                 this.$ellipsis = this.$element.children().eq(0).clone().removeClass().addClass(this.namespace + '-ellipsis').html(this.options.ellipsis);
-                
             }
 
             if (this.options.overflow === 'right') {
@@ -113,7 +114,8 @@
                 }
             }
 
-            this.createDropList =  true;
+            this.dropdownWidth = this.$dropdownWrap.outerWidth() + (this.options.ellipsis ? this.$ellipsis.outerWidth() : 0);
+            this.createDropList = true;
         },
         deleteDropdown: function() {
             if (this.current > 1) {
@@ -155,10 +157,10 @@
                 }
 
                 this.childrenWidthTotal += this.childrenWithWidths[real][1];
-                if (this.childrenWidthTotal > this.width) {
+                if (this.childrenWidthTotal + this.dropdownWidth > this.width) {
                     this.createDropdown();
                     $(this.childrenWithWidths[real][0]).appendTo(this.$element.find('.' + this.namespace + '-menu'));
-                } else if (real === reverse && this.childrenWidthTotal < this.width) {
+                } else if (real === reverse && this.childrenWidthTotal + this.dropdownWidth < this.width) {
                     if (this.options.overflow === "left") {
                         if (this.options.ellipsis) {
                             $(this.childrenWithWidths[reverse][0].insertAfter(this.$ellipsis));
@@ -228,9 +230,9 @@
 
         dropdown: function() {
             return '<div class=\"dropdown\">' +
-                   '<a href=\"javascript:void(0);\" class=\"' + this.namespace + '-toggle\" data-toggle=\"dropdown\"><i class=\"' + this.dropicon + '\"</i></a>' +
-                   '<ul class=\"' + this.namespace + '-menu dropdown-menu\"></ul>' +
-                   '</div>';
+                '<a href=\"javascript:void(0);\" class=\"' + this.namespace + '-toggle\" data-toggle=\"dropdown\"><i class=\"' + this.dropicon + '\"></i></a>' +
+                '<ul class=\"' + this.namespace + '-menu dropdown-menu\"></ul>' +
+                '</div>';
         },
 
         getItem: function($parent) {
