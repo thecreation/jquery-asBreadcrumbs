@@ -1,4 +1,4 @@
-/*! jQuery asBreadcrumbs - v0.1.0 - 2015-03-08
+/*! jQuery asBreadcrumbs - v0.1.0 - 2015-05-08
 * https://github.com/amazingSurge/jquery-asBreadcrumbs
 * Copyright (c) 2015 amazingSurge; Licensed GPL */
 (function($, document, window, undefined) {
@@ -28,7 +28,6 @@
         constructor: Plugin,
         init: function() {
             var self = this;
-            this._bindEvent();
 
             this.createDropList = false;
             this.childrenWithWidths = [];
@@ -43,8 +42,10 @@
 
             this.$element.addClass(this.namespace + '-' + this.options.overflow);
 
+            // In order to get the dropdownWidth
             this.createDropdown();
             this.deleteDropdown();
+
             this.calculate();
 
             if (this.options.responsive) {
@@ -55,19 +56,6 @@
 
             this.initialized = true;
             this._trigger('ready');
-        },
-        _bindEvent: function() {
-            var self = this;
-            this.$element.on('click', '.' + this.namespace + '-dropdown', function(e) {
-                if ($(this).hasClass(self.classes.active)) {
-                    $(this).find('.' + self.namespace + '-menu').fadeOut();
-                    $(this).removeClass(self.classes.active);
-                } else {
-                    $(this).find('.' + self.namespace + '-menu').fadeIn();
-                    $(this).addClass(self.classes.active);
-                    e.stopPropagation();
-                }
-            });
         },
         _trigger: function(eventType) {
             var method_arguments = Array.prototype.slice.call(arguments, 1),
