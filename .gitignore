@@ -1,19 +1,29 @@
-# Ignore docs files
-_gh_pages
-_site
-.ruby-version
-
-# Numerous always-ignore extensions
-*.diff
-*.err
-*.orig
+lib-cov
+*.csv
+*.dat
+*.gz
 *.log
-*.rej
-*.swo
-*.swp
+*.out
+*.pid
+*.rar
+*.seed
+*.sublime-*
 *.zip
-*.vi
-*~
+*.un~
+*.swp
+*.settings
+
+pids
+logs
+results
+npm-debug.log
+TODO.md
+
+bower_components
+node_modules
+_gh_pages
+temp
+tmp
 
 # OS or Editor folders
 .DS_Store
@@ -21,22 +31,8 @@ _site
 Thumbs.db
 .cache
 .project
-.settings
 .tmproj
 *.esproj
 nbproject
 *.sublime-project
 *.sublime-workspace
-.idea
-
-# Komodo
-*.komodoproject
-.komodotools
-
-# grunt-html-validation
-validation-status.json
-validation-report.json
-
-# Folders to ignore
-node_modules
-bower_components
