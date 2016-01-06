@@ -5,12 +5,12 @@
  * Copyright (c) 2015 amazingSurge
  * Licensed under the MIT license.
  */
-(function($, document, window, undefined) {
+(function ($, document, window, undefined) {
     "use strict";
 
     var pluginName = 'asBreadcrumbs';
 
-    var Plugin = $[pluginName] = function(element, options) {
+    var Plugin = $[pluginName] = function (element, options) {
         this.element = element;
         this.$element = $(element);
 
@@ -30,7 +30,7 @@
 
     Plugin.prototype = {
         constructor: Plugin,
-        init: function() {
+        init: function () {
             var self = this;
 
             this.createDropList = false;
@@ -39,8 +39,11 @@
             this.dropdownWidth = 0;
 
             var children = this.options.getItem(this.$element);
-            children.each(function() {
-                self.childrenWithWidths.push([$(this), $(this).outerWidth()]);
+            var $item;
+            children.each(function () {
+                $item = $(self.options.dropdownContent($(this).text()));
+
+                self.childrenWithWidths.push([$item, $(this), $(this).outerWidth()]);
             });
             this.length = this.childrenWithWidths.length;
 
@@ -53,7 +56,7 @@
             this.calculate();
 
             if (this.options.responsive) {
-                $(window).on('resize', this._throttle(function() {
+                $(window).on('resize', this._throttle(function () {
                     self.resize.call(self);
                 }, 250));
             }
@@ -61,7 +64,7 @@
             this.initialized = true;
             this._trigger('ready');
         },
-        _trigger: function(eventType) {
+        _trigger: function (eventType) {
             var method_arguments = Array.prototype.slice.call(arguments, 1),
                 data = [this].concat(method_arguments);
 
@@ -69,7 +72,7 @@
             this.$element.trigger(pluginName + '::' + eventType, data);
 
             // callback
-            eventType = eventType.replace(/\b\w+\b/g, function(word) {
+            eventType = eventType.replace(/\b\w+\b/g, function (word) {
                 return word.substring(0, 1).toUpperCase() + word.substring(1);
             });
             var onFunction = 'on' + eventType;
@@ -77,12 +80,12 @@
                 this.options[onFunction].apply(this, method_arguments);
             }
         },
-        createDropdown: function() {
+        createDropdown: function () {
             if (this.createDropList === true) {
                 return;
             }
             var dropdown = this.options.dropdown();
-            this.$dropdownWrap = this.$element.children().eq(0).clone().removeClass().addClass(this.namespace + '-dropdown').html(dropdown);
+            this.$dropdownWrap = this.$element.children().eq(0).clone().removeClass().addClass(this.namespace + '-dropdown').addClass('dropdown').html(dropdown);
 
             if (this.options.ellipsis) {
                 this.$ellipsis = this.$element.children().eq(0).clone().removeClass().addClass(this.namespace + '-ellipsis').html(this.options.ellipsis);
@@ -105,7 +108,7 @@
             this.dropdownWidth = this.$dropdownWrap.outerWidth() + (this.options.ellipsis ? this.$ellipsis.outerWidth() : 0);
             this.createDropList = true;
         },
-        deleteDropdown: function() {
+        deleteDropdown: function () {
             if (this.current > 1) {
                 return;
             }
@@ -116,9 +119,9 @@
             }
             this.createDropList = false;
         },
-        _getParameters: function() {
+        _getParameters: function () {
             var width = 0;
-            this.$element.children().each(function() {
+            this.$element.children().each(function () {
                 if ($(this).css('display') === 'inline-block' && $(this).css('float') === 'none') {
                     width += 6;
                 }
@@ -130,12 +133,13 @@
                 this.childrenWidthTotal = 0;
             }
         },
-        calculate: function() {
+        calculate: function () {
             this._getParameters();
-
             var real, reverse;
+
             for (var i = 0; i < this.length; i++) {
                 this.current = this.$element.find('.' + this.namespace + '-menu').children().length;
+
                 if (this.options.overflow === "left") {
                     real = this.length - i - 1;
                     reverse = this.current - 1;
@@ -143,48 +147,37 @@
                     real = i;
                     reverse = this.length - this.current;
                 }
-
-                this.childrenWidthTotal += this.childrenWithWidths[real][1];
+                this.childrenWidthTotal += this.childrenWithWidths[real][2];
                 if (this.childrenWidthTotal + this.dropdownWidth > this.width) {
                     this.createDropdown();
+                    $(this.childrenWithWidths[real][1]).hide();
                     $(this.childrenWithWidths[real][0]).appendTo(this.$element.find('.' + this.namespace + '-menu'));
-                } else if (real === reverse && this.childrenWidthTotal + this.dropdownWidth < this.width) {
-                    if (this.options.overflow === "left") {
-                        if (this.options.ellipsis) {
-                            $(this.childrenWithWidths[reverse][0].insertAfter(this.$ellipsis));
-                        } else {
-                            $(this.childrenWithWidths[reverse][0].insertAfter(this.$dropdownWrap));
-                        }
-                    } else {
-                        if (this.options.ellipsis) {
-                            $(this.childrenWithWidths[reverse][0].insertBefore(this.$ellipsis));
-                        } else {
-                            $(this.childrenWithWidths[reverse][0].insertBefore(this.$dropdownWrap));
-                        }
-                    }
+                } else if (real === reverse && this.childrenWidthTotal + this.dropdownWidth < this.width)  {
+                    $(this.childrenWithWidths[real][1]).show();
+                    $(this.childrenWithWidths[real][0]).remove();
                     this.deleteDropdown();
                 }
             }
         },
-        resize: function() {
+        resize: function () {
             this._trigger('resize');
 
             this.calculate();
         },
-        _throttle: function(func, wait) {
-            var _now = Date.now || function() {
+        _throttle: function (func, wait) {
+            var _now = Date.now || function () {
                 return new Date().getTime();
             };
             var context, args, result;
             var timeout = null;
             var previous = 0;
-            var later = function() {
+            var later = function () {
                 previous = _now();
                 timeout = null;
                 result = func.apply(context, args);
                 context = args = null;
             };
-            return function() {
+            return function () {
                 var now = _now();
                 var remaining = wait - (now - previous);
                 context = this;
@@ -201,7 +194,7 @@
                 return result;
             };
         },
-        destory: function() {
+        destory: function () {
             // detached events first
             // then remove all js generated html
             this.$element.data(pluginName, null);
@@ -216,14 +209,16 @@
         dropicon: "caret",
         responsive: true,
 
-        dropdown: function() {
+        dropdown: function () {
             return '<div class=\"dropdown\">' +
                 '<a href=\"javascript:void(0);\" class=\"' + this.namespace + '-toggle\" data-toggle=\"dropdown\"><i class=\"' + this.dropicon + '\"></i></a>' +
                 '<ul class=\"' + this.namespace + '-menu dropdown-menu\"></ul>' +
                 '</div>';
         },
-
-        getItem: function($parent) {
+        dropdownContent: function (value) {
+            return '<li class=\"dropdown-item\">' + value + '</li>';
+        },
+        getItem: function ($parent) {
             return $parent.children();
         },
 
@@ -232,7 +227,7 @@
         onReady: null
     };
 
-    $.fn[pluginName] = function(options) {
+    $.fn[pluginName] = function (options) {
         if (typeof options === 'string') {
             var method = options;
             var method_arguments = Array.prototype.slice.call(arguments, 1);
@@ -245,7 +240,7 @@
                     return api[method].apply(api, method_arguments);
                 }
             } else {
-                return this.each(function() {
+                return this.each(function () {
                     var api = $.data(this, pluginName);
                     if (api && typeof api[method] === 'function') {
                         api[method].apply(api, method_arguments);
@@ -253,7 +248,7 @@
                 });
             }
         } else {
-            return this.each(function() {
+            return this.each(function () {
                 if (!$.data(this, pluginName)) {
                     $.data(this, pluginName, new Plugin(this, options));
                 }
