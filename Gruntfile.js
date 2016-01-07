@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
     // Project configuration.
     grunt.initConfig({
@@ -35,6 +35,21 @@ module.exports = function(grunt) {
                 src: '<%= concat.dist.dest %>',
                 dest: 'dist/<%= pkg.name %>.min.js'
             },
+        },
+        babel: {
+            options: {
+                sourceMap: false,
+                presets: ["es2015"],
+                plugins: ["transform-es2015-modules-umd","external-helpers-2"]
+            },
+            dist: {
+                files: [{
+                    expand: true,
+                    cwd: 'src/',
+                    src: ['**/*.js'],
+                    dest: 'dist/'
+                }]
+            }
         },
 
         // -- jshint config ----------------------------------------------------------
