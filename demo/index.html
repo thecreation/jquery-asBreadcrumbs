@@ -17,7 +17,7 @@
         <link rel="stylesheet" href="../css/asBreadcrumbs.css">
         <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
         <script src="../libs/jquery/jquery.js"></script>
-        <script src="../dist/babel.external.helpers.js"></script>
+        <script src="../libs/babel.external.helpers.js"></script>
         <script src="js/jquery.toc.js"></script>
         <script src="js/prism.js"></script>
         <script src="js/bootstrap.min.js"></script>
@@ -32,9 +32,9 @@
         .caret:before {
             content: '▼';
         }
-
-        .container{
-            margin:0 20px 0 190px;
+        
+        .container {
+            margin: 0 20px 0 190px;
         }
         </style>
     </head>
@@ -66,27 +66,38 @@
                             <li><a href="#">Customize</a></li>
                             <li class="active">Data</li>
                         </ol>
-                         <ol class="breadcrumb" data-overflow="right">
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">Getting Started</a></li>
-                        <li><a href="#">Library</a></li>
-                        <li><a href="#">Document</a></li>
-                        <li><a href="#">Components</a></li>
-                        <li><a href="#">JavaScript</a></li>
-                        <li><a href="#">Customize</a></li>
-                        <li class="active">Data</li>
-                    </ol>
+                        <ol class="breadcrumb" data-overflow="right">
+                            <li><a href="#">Home</a></li>
+                            <li><a href="#">Getting Started</a></li>
+                            <li><a href="#">Library</a></li>
+                            <li><a href="#">Document</a></li>
+                            <li><a href="#">Components</a></li>
+                            <li><a href="#">JavaScript</a></li>
+                            <li><a href="#">Customize</a></li>
+                            <li class="active">Data</li>
+                        </ol>
                     </div>
                 </section>
+                <button class="init-btn">init</button>
+                <button class="destroy-btn">destroy</button>
             </section>
         </div>
         <script type="text/javascript">
         $(document).ready(function() {
-                (function() {
-                    $('#toc').toc();
-                })();
+            (function() {
+                $('#toc').toc();
+            })();
             $('.breadcrumb').asBreadcrumbs({
                 namespace: 'breadcrumb'
+            });
+
+            $(".destroy-btn").on("click", function() {
+                $(".breadcrumb").asBreadcrumbs("destroy");
+            });
+            $(".init-btn").on("click", function() {
+                $(".breadcrumb").asBreadcrumbs({
+                    namespace: 'breadcrumb'
+                });
             });
         });
         </script>

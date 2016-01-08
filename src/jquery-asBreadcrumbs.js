@@ -173,7 +173,7 @@ class asBreadcrumbs {
 				$(this.childrenWithWidths[real][1]).hide();
 				$(this.childrenWithWidths[real][0]).appendTo(this.$element.find('.' + this.namespace + '-menu'));
 			} else if (real === reverse && this.childrenWidthTotal + this.dropdownWidth < this.width) {
-				$(this.childrenWithWidths[real][1]).show();
+				$(this.childrenWithWidths[real][1]).css("display", "inline-block");
 				$(this.childrenWithWidths[real][0]).remove();
 				this.deleteDropdown();
 			}
@@ -217,11 +217,16 @@ class asBreadcrumbs {
 		};
 	}
 
-	destory() {
+	destroy() {
 		// detached events first
 		// then remove all js generated html
+		this.$element.children().css("display", "");
+		$("." + this.namespace + "-dropdown").remove();
+		$("." + this.namespace + "-ellipsis").remove();
 		this.$element.data(NAME, null);
-		this._trigger('destory');
+		$(window).off("resize");
+		$(window).off(".asBreadcrumbs");
+		this._trigger('destroy');
 	}
 
 	static _jQueryInterface(options, ...params) {

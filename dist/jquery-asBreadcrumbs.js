@@ -194,7 +194,7 @@
 						(0, _jQuery2.default)(this.childrenWithWidths[real][1]).hide();
 						(0, _jQuery2.default)(this.childrenWithWidths[real][0]).appendTo(this.$element.find('.' + this.namespace + '-menu'));
 					} else if (real === reverse && this.childrenWidthTotal + this.dropdownWidth < this.width) {
-						(0, _jQuery2.default)(this.childrenWithWidths[real][1]).show();
+						(0, _jQuery2.default)(this.childrenWithWidths[real][1]).css("display", "inline-block");
 						(0, _jQuery2.default)(this.childrenWithWidths[real][0]).remove();
 						this.deleteDropdown();
 					}
@@ -248,11 +248,16 @@
 				};
 			}
 		}, {
-			key: "destory",
-			value: function destory() {
+			key: "destroy",
+			value: function destroy() {
+				this.$element.children().css("display", "");
+				(0, _jQuery2.default)("." + this.namespace + "-dropdown").remove();
+				(0, _jQuery2.default)("." + this.namespace + "-ellipsis").remove();
 				this.$element.data(NAME, null);
+				(0, _jQuery2.default)(window).off("resize");
+				(0, _jQuery2.default)(window).off(".asBreadcrumbs");
 
-				this._trigger('destory');
+				this._trigger('destroy');
 			}
 		}], [{
 			key: "_jQueryInterface",
