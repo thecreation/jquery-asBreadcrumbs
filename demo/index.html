@@ -77,6 +77,8 @@
                     </ol>
                     </div>
                 </section>
+                <button class="init-btn">init</button>
+                <button class="destroy-btn">destroy</button>
             </section>
         </div>
         <script type="text/javascript">
@@ -87,6 +89,16 @@
             $('.breadcrumb').asBreadcrumbs({
                 namespace: 'breadcrumb'
             });
+
+            $(".destroy-btn").on("click",function(){
+                $(".breadcrumb").asBreadcrumbs("destroy");
+            })
+
+            $(".init-btn").on("click",function(){
+                $(".breadcrumb").asBreadcrumbs({
+                    namespace: 'breadcrumb'
+                });
+            })
         });
         </script>
     </body>
