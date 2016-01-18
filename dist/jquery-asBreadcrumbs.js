@@ -75,7 +75,7 @@
 				this.$element.addClass(this.namespace + '-' + this.options.overflow);
 				this.createDropdown();
 				this.deleteDropdown();
-				this.calculate();
+				this.action();
 
 				if (this.options.responsive) {
 					(0, _jQuery2.default)(window).on('resize', this._throttle(function () {
@@ -170,30 +170,48 @@
 			}
 		}, {
 			key: "calculate",
-			value: function calculate() {
+			value: function calculate(i) {
 				this._getParameters();
 
 				var real = undefined,
-				    reverse = undefined;
+				    reverse = undefined,
+				    childrenWidthTotal = undefined;
+				this.current = this.$element.find('.' + this.namespace + '-menu').children().length;
+
+				if (this.options.overflow === "left") {
+					real = this.length - i - 1;
+					reverse = this.current - 1;
+				} else {
+					real = i;
+					reverse = this.length - this.current;
+				}
+
+				childrenWidthTotal = this.childrenWithWidths[real][2];
+				return {
+					real: real,
+					reverse: reverse,
+					childrenWidthTotal: childrenWidthTotal
+				};
+			}
+		}, {
+			key: "action",
+			value: function action() {
+				var real = undefined,
+				    reverse = undefined,
+				    calculate = undefined,
+				    childrenWidthTotal = 0;
 
 				for (var i = 0; i < this.length; i++) {
-					this.current = this.$element.find('.' + this.namespace + '-menu').children().length;
+					calculate = this.calculate(i);
+					real = calculate.real;
+					reverse = calculate.reverse;
+					childrenWidthTotal += calculate.childrenWidthTotal;
 
-					if (this.options.overflow === "left") {
-						real = this.length - i - 1;
-						reverse = this.current - 1;
-					} else {
-						real = i;
-						reverse = this.length - this.current;
-					}
-
-					this.childrenWidthTotal += this.childrenWithWidths[real][2];
-
-					if (this.childrenWidthTotal + this.dropdownWidth > this.width) {
+					if (childrenWidthTotal + this.dropdownWidth > this.width) {
 						this.createDropdown();
 						(0, _jQuery2.default)(this.childrenWithWidths[real][1]).hide();
 						(0, _jQuery2.default)(this.childrenWithWidths[real][0]).appendTo(this.$element.find('.' + this.namespace + '-menu'));
-					} else if (real === reverse && this.childrenWidthTotal + this.dropdownWidth < this.width) {
+					} else if (real === reverse && childrenWidthTotal + this.dropdownWidth < this.width) {
 						(0, _jQuery2.default)(this.childrenWithWidths[real][1]).css("display", "inline-block");
 						(0, _jQuery2.default)(this.childrenWithWidths[real][0]).remove();
 						this.deleteDropdown();
@@ -205,7 +223,7 @@
 			value: function resize() {
 				this._trigger('resize');
 
-				this.calculate();
+				this.action();
 			}
 		}, {
 			key: "_throttle",

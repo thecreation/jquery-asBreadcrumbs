@@ -69,7 +69,7 @@ class asBreadcrumbs {
 		this.createDropdown();
 		this.deleteDropdown();
 
-		this.calculate();
+		this.action();
 
 		if (this.options.responsive) {
 			$(window).on('resize', this._throttle(() => {
@@ -153,26 +153,39 @@ class asBreadcrumbs {
 		}
 	}
 
-	calculate() {
+	calculate(i) {
 		this._getParameters();
-		let real, reverse;
+		let real, reverse,childrenWidthTotal;
 
-		for (let i = 0; i < this.length; i++) {
-			this.current = this.$element.find('.' + this.namespace + '-menu').children().length;
+		this.current = this.$element.find('.' + this.namespace + '-menu').children().length;
 
-			if (this.options.overflow === "left") {
-				real = this.length - i - 1;
-				reverse = this.current - 1;
-			} else {
-				real = i;
-				reverse = this.length - this.current;
-			}
-			this.childrenWidthTotal += this.childrenWithWidths[real][2];
-			if (this.childrenWidthTotal + this.dropdownWidth > this.width) {
+		if (this.options.overflow === "left") {
+			real = this.length - i - 1;
+			reverse = this.current - 1;
+		} else {
+			real = i;
+			reverse = this.length - this.current;
+		}
+		childrenWidthTotal = this.childrenWithWidths[real][2];
+
+		return {real,reverse,childrenWidthTotal};
+	}
+
+	action() {
+		let real, reverse, calculate,childrenWidthTotal = 0;
+
+		for (var i = 0; i < this.length; i++) {
+			
+			calculate = this.calculate(i);
+			real = calculate.real;
+			reverse = calculate.reverse;
+			childrenWidthTotal += calculate.childrenWidthTotal;
+
+			if (childrenWidthTotal + this.dropdownWidth > this.width) {
 				this.createDropdown();
 				$(this.childrenWithWidths[real][1]).hide();
 				$(this.childrenWithWidths[real][0]).appendTo(this.$element.find('.' + this.namespace + '-menu'));
-			} else if (real === reverse && this.childrenWidthTotal + this.dropdownWidth < this.width) {
+			} else if (real === reverse && childrenWidthTotal + this.dropdownWidth < this.width) {
 				$(this.childrenWithWidths[real][1]).css("display", "inline-block");
 				$(this.childrenWithWidths[real][0]).remove();
 				this.deleteDropdown();
@@ -183,7 +196,7 @@ class asBreadcrumbs {
 	resize() {
 		this._trigger('resize');
 
-		this.calculate();
+		this.action();
 	}
 
 	_throttle(func, wait) {
