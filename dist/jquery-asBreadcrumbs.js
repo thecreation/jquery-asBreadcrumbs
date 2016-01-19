@@ -49,6 +49,12 @@
 			this.$element.addClass(this.namespace);
 			this.disabled = false;
 			this.initialized = false;
+			this.createDropList = false;
+			this.childrenWithWidths = [];
+			this.current = 0;
+			this.dropdownWidth = 0;
+			this.isReverse = false;
+			this.$item = this.$element.children().eq(0);
 
 			this._trigger('init');
 
@@ -61,21 +67,21 @@
 				var _this = this;
 
 				var self = this;
-				this.createDropList = false;
-				this.childrenWithWidths = [];
-				this.current = 0;
-				this.dropdownWidth = 0;
 				var children = this.options.getItem(this.$element);
 				var $item = undefined;
 				children.each(function () {
 					$item = (0, _jQuery2.default)(self.options.dropdownContent((0, _jQuery2.default)(this).text()));
-					self.childrenWithWidths.push([$item, (0, _jQuery2.default)(this), (0, _jQuery2.default)(this).outerWidth()]);
+					self.childrenWithWidths.push({
+						"item": $item,
+						"_this": (0, _jQuery2.default)(this),
+						"thisOuterWidth": (0, _jQuery2.default)(this).outerWidth()
+					});
 				});
 				this.length = this.childrenWithWidths.length;
 				this.$element.addClass(this.namespace + '-' + this.options.overflow);
 				this.createDropdown();
 				this.deleteDropdown();
-				this.action();
+				this.building();
 
 				if (this.options.responsive) {
 					(0, _jQuery2.default)(window).on('resize', this._throttle(function () {
@@ -113,10 +119,10 @@
 				}
 
 				var dropdown = this.options.dropdown();
-				this.$dropdownWrap = this.$element.children().eq(0).clone().removeClass().addClass(this.namespace + '-dropdown').addClass('dropdown').html(dropdown);
+				this.$dropdownWrap = this.$item.clone().removeClass().addClass(this.namespace + '-dropdown').addClass('dropdown').html(dropdown);
 
 				if (this.options.ellipsis) {
-					this.$ellipsis = this.$element.children().eq(0).clone().removeClass().addClass(this.namespace + '-ellipsis').html(this.options.ellipsis);
+					this.$ellipsis = this.$item.clone().removeClass().addClass(this.namespace + '-ellipsis').html(this.options.ellipsis);
 				}
 
 				if (this.options.overflow === 'right') {
@@ -139,14 +145,10 @@
 		}, {
 			key: "deleteDropdown",
 			value: function deleteDropdown() {
-				if (this.current > 1) {
-					return;
-				}
-
-				this.$element.find('.' + this.namespace + '-dropdown').remove();
+				this.$dropdownWrap.remove();
 
 				if (this.options.ellipsis) {
-					this.$element.find('.' + this.namespace + '-ellipsis').remove();
+					this.$ellipsis.remove();
 				}
 
 				this.createDropList = false;
@@ -171,50 +173,42 @@
 		}, {
 			key: "calculate",
 			value: function calculate(i) {
+				if (!_jQuery2.default.isNumeric(i) || i < 0) {
+					return;
+				}
+
 				this._getParameters();
 
-				var real = undefined,
-				    reverse = undefined,
-				    childrenWidthTotal = undefined;
 				this.current = this.$element.find('.' + this.namespace + '-menu').children().length;
 
 				if (this.options.overflow === "left") {
-					real = this.length - i - 1;
-					reverse = this.current - 1;
-				} else {
-					real = i;
-					reverse = this.length - this.current;
+					if (!this.isReverse) {
+						this.childrenWithWidths.reverse();
+						this.isReverse = true;
+					}
 				}
 
-				childrenWidthTotal = this.childrenWithWidths[real][2];
-				return {
-					real: real,
-					reverse: reverse,
-					childrenWidthTotal: childrenWidthTotal
-				};
+				return this.childrenWithWidths[i].thisOuterWidth;
 			}
 		}, {
-			key: "action",
-			value: function action() {
-				var real = undefined,
-				    reverse = undefined,
-				    calculate = undefined,
-				    childrenWidthTotal = 0;
+			key: "building",
+			value: function building() {
+				var childrenWidthTotal = 0;
 
 				for (var i = 0; i < this.length; i++) {
-					calculate = this.calculate(i);
-					real = calculate.real;
-					reverse = calculate.reverse;
-					childrenWidthTotal += calculate.childrenWidthTotal;
+					childrenWidthTotal += this.calculate(i);
 
 					if (childrenWidthTotal + this.dropdownWidth > this.width) {
 						this.createDropdown();
-						(0, _jQuery2.default)(this.childrenWithWidths[real][1]).hide();
-						(0, _jQuery2.default)(this.childrenWithWidths[real][0]).appendTo(this.$element.find('.' + this.namespace + '-menu'));
-					} else if (real === reverse && childrenWidthTotal + this.dropdownWidth < this.width) {
-						(0, _jQuery2.default)(this.childrenWithWidths[real][1]).css("display", "inline-block");
-						(0, _jQuery2.default)(this.childrenWithWidths[real][0]).remove();
-						this.deleteDropdown();
+						(0, _jQuery2.default)(this.childrenWithWidths[i]._this).hide();
+						(0, _jQuery2.default)(this.childrenWithWidths[i].item).appendTo(this.$element.find('.' + this.namespace + '-menu'));
+					} else if (childrenWidthTotal + this.dropdownWidth < this.width) {
+						(0, _jQuery2.default)(this.childrenWithWidths[i]._this).css("display", "inline-block");
+						(0, _jQuery2.default)(this.childrenWithWidths[i].item).remove();
+
+						if (this.current < 1) {
+							this.deleteDropdown();
+						}
 					}
 				}
 			}
@@ -223,7 +217,7 @@
 			value: function resize() {
 				this._trigger('resize');
 
-				this.action();
+				this.building();
 			}
 		}, {
 			key: "_throttle",
@@ -269,8 +263,7 @@
 			key: "destroy",
 			value: function destroy() {
 				this.$element.children().css("display", "");
-				(0, _jQuery2.default)("." + this.namespace + "-dropdown").remove();
-				(0, _jQuery2.default)("." + this.namespace + "-ellipsis").remove();
+				this.deleteDropdown();
 				this.$element.data(NAME, null);
 				(0, _jQuery2.default)(window).off("resize");
 				(0, _jQuery2.default)(window).off(".asBreadcrumbs");
