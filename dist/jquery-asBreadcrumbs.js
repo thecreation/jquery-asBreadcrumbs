@@ -1,326 +1,346 @@
-"use strict";
-
 (function (global, factory) {
-	if (typeof define === "function" && define.amd) {
-		define(["exports", "jQuery"], factory);
-	} else if (typeof exports !== "undefined") {
-		factory(exports, require("jQuery"));
-	} else {
-		var mod = {
-			exports: {}
-		};
-		factory(mod.exports, global.jQuery);
-		global.jqueryAsBreadcrumbs = mod.exports;
-	}
+    if (typeof define === "function" && define.amd) {
+        define(["exports", "jQuery"], factory);
+    } else if (typeof exports !== "undefined") {
+        factory(exports, require("jQuery"));
+    } else {
+        var mod = {
+            exports: {}
+        };
+        factory(mod.exports, global.jQuery);
+        global.jqueryAsBreadcrumbs = mod.exports;
+    }
 })(this, function (exports, _jQuery) {
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
+    "use strict";
 
-	var _jQuery2 = babelHelpers.interopRequireDefault(_jQuery);
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
 
-	var NAME = "asBreadcrumbs";
-	var DEFAULT = {
-		namespace: NAME,
-		overflow: "left",
-		ellipsis: "&#8230;",
-		dropicon: "caret",
-		responsive: true,
-		dropdown: function dropdown() {
-			return '<div class=\"dropdown\">' + '<a href=\"javascript:void(0);\" class=\"' + this.namespace + '-toggle\" data-toggle=\"dropdown\"><i class=\"' + this.dropicon + '\"></i></a>' + '<ul class=\"' + this.namespace + '-menu dropdown-menu\"></ul>' + '</div>';
-		},
-		dropdownContent: function dropdownContent(value) {
-			return '<li class=\"dropdown-item\">' + value + '</li>';
-		},
-		getItem: function getItem($parent) {
-			return $parent.children();
-		},
-		onInit: null,
-		onReady: null
-	};
+    var _jQuery2 = babelHelpers.interopRequireDefault(_jQuery);
 
-	var asBreadcrumbs = function () {
-		function asBreadcrumbs(element, options) {
-			babelHelpers.classCallCheck(this, asBreadcrumbs);
-			this.element = element;
-			this.$element = (0, _jQuery2.default)(element);
-			this.options = _jQuery2.default.extend({}, DEFAULT, options, this.$element.data());
-			this.namespace = this.options.namespace;
-			this.$element.addClass(this.namespace);
-			this.disabled = false;
-			this.initialized = false;
-			this.createDropList = false;
-			this.$item = this.$element.children().eq(0);
-			this.children = this.options.getItem(this.$element);
-			this.WidthPlus = 6;
-			this.childrenInfo = [];
+    var NAME = "asBreadcrumbs";
+    var DEFAULT = {
+        namespace: NAME,
+        overflow: "left",
+        ellipsis: "&#8230;",
+        dropicon: "caret",
+        responsive: true,
+        dropdown: function dropdown() {
+            return '<div class=\"dropdown\">' + '<a href=\"javascript:void(0);\" class=\"' + this.namespace + '-toggle\" data-toggle=\"dropdown\"><i class=\"' + this.dropicon + '\"></i></a>' + '<ul class=\"' + this.namespace + '-menu dropdown-menu\"></ul>' + '</div>';
+        },
+        dropdownContent: function dropdownContent(value) {
+            return '<li class=\"dropdown-item\">' + value + '</li>';
+        },
+        getItem: function getItem($parent) {
+            return $parent.children();
+        },
+        onInit: null,
+        onReady: null
+    };
 
-			this._trigger('init');
+    var asBreadcrumbs = function () {
+        function asBreadcrumbs(element, options) {
+            babelHelpers.classCallCheck(this, asBreadcrumbs);
+            this.element = element;
+            this.$element = (0, _jQuery2.default)(element);
+            this.options = _jQuery2.default.extend({}, DEFAULT, options, this.$element.data());
+            this.namespace = this.options.namespace;
+            this.$element.addClass(this.namespace);
+            this.disabled = false;
+            this.initialized = false;
+            this.isCreated = false;
+            this.$children = this.options.getItem(this.$element);
+            this.$firstChild = this.$children.eq(0);
+            this.$dropdownWrap = null;
+            this.$dropdownMenu = null;
+            this.gap = 6;
+            this.childrenInfo = [];
 
-			this.init();
-		}
+            this._trigger('init');
 
-		babelHelpers.createClass(asBreadcrumbs, [{
-			key: "init",
-			value: function init() {
-				var _this = this;
+            this.init();
+        }
 
-				var self = this;
-				this.children.each(function () {
-					self.childrenInfo.push({
-						"_this": (0, _jQuery2.default)(this),
-						"thisOuterWidth": (0, _jQuery2.default)(this).outerWidth(),
-						"text": (0, _jQuery2.default)(self.options.dropdownContent((0, _jQuery2.default)(this).text()))
-					});
-				});
-				this.length = this.childrenInfo.length;
+        babelHelpers.createClass(asBreadcrumbs, [{
+            key: "init",
+            value: function init() {
+                var _this = this;
 
-				if (this.options.overflow === "left") {
-					this.childrenInfo.reverse();
-				}
+                var self = this;
+                this.$element.addClass(this.namespace + '-' + this.options.overflow);
+                this.generateChildrenInfo();
+                this.createDropdown();
+                this.render();
 
-				this.$element.addClass(this.namespace + '-' + this.options.overflow);
-				this.createDropdown();
-				this.dropdownWidth = this.$dropdownWrap.outerWidth() + (this.options.ellipsis ? this.$ellipsis.outerWidth() : 0);
-				this.build();
+                if (this.options.responsive) {
+                    (0, _jQuery2.default)(window).on('resize', this._throttle(function () {
+                        _this.resize.call(_this);
+                    }, 250));
+                }
 
-				if (this.options.responsive) {
-					(0, _jQuery2.default)(window).on('resize', this._throttle(function () {
-						_this.resize.call(_this);
-					}, 250));
-				}
+                this.initialized = true;
 
-				this.initialized = true;
+                this._trigger('ready');
+            }
+        }, {
+            key: "generateChildrenInfo",
+            value: function generateChildrenInfo() {
+                var self = this;
+                this.$children.each(function () {
+                    var $this = (0, _jQuery2.default)(this);
+                    self.childrenInfo.push({
+                        $this: $this,
+                        outerWidth: $this.outerWidth(),
+                        $content: (0, _jQuery2.default)(self.options.dropdownContent($this.text()))
+                    });
+                });
 
-				this._trigger('ready');
-			}
-		}, {
-			key: "_trigger",
-			value: function _trigger(eventType) {
-				for (var _len = arguments.length, params = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-					params[_key - 1] = arguments[_key];
-				}
+                if (this.options.overflow === "left") {
+                    this.childrenInfo.reverse();
+                }
 
-				var data = [this].concat(params);
-				this.$element.trigger(NAME + '::' + eventType, data);
-				eventType = eventType.replace(/\b\w+\b/g, function (word) {
-					return word.substring(0, 1).toUpperCase() + word.substring(1);
-				});
-				var onFunction = 'on' + eventType;
+                this.childrenLength = this.childrenInfo.length;
+            }
+        }, {
+            key: "createDropdown",
+            value: function createDropdown() {
+                if (this.isCreated === true) {
+                    return;
+                }
 
-				if (typeof this.options[onFunction] === 'function') {
-					this.options[onFunction].apply(this, params);
-				}
-			}
-		}, {
-			key: "createDropdown",
-			value: function createDropdown() {
-				if (this.createDropList === true) {
-					return;
-				}
+                var dropdown = this.options.dropdown();
+                this.$dropdownWrap = this.$firstChild.clone().removeClass().addClass(this.namespace + '-dropdown dropdown').html(dropdown).hide();
+                this.$dropdownMenu = this.$dropdownWrap.find('.dropdown-menu');
 
-				var dropdown = this.options.dropdown();
-				this.$dropdownWrap = this.$item.clone().removeClass().addClass(this.namespace + '-dropdown').addClass('dropdown').html(dropdown).hide();
+                this._createDropdownItem();
 
-				if (this.options.overflow === 'right') {
-					this.$dropdownWrap.appendTo(this.$element);
-				} else {
-					this.$dropdownWrap.prependTo(this.$element);
-				}
+                if (this.options.overflow === 'right') {
+                    this.$dropdownWrap.appendTo(this.$element);
+                } else {
+                    this.$dropdownWrap.prependTo(this.$element);
+                }
 
-				this._createEllipsis();
+                this._createEllipsis();
 
-				for (var i = 0, l = this.length; i < l; i++) {
-					this.childrenInfo[i].text.appendTo(this.$element.find('.' + this.namespace + '-menu')).hide();
-				}
+                this.isCreated = true;
+            }
+        }, {
+            key: "render",
+            value: function render() {
+                var dropdownWidth = this.getDropdownWidth(),
+                    childrenWidthTotal = 0,
+                    childWidth = 0,
+                    width = 0;
 
-				this.createDropList = true;
-			}
-		}, {
-			key: "_createEllipsis",
-			value: function _createEllipsis() {
-				if (!this.options.ellipsis) {
-					return;
-				}
+                for (var i = 0, l = this.childrenLength; i < l; i++) {
+                    width = this.getWidth();
+                    childWidth = this.childrenInfo[i].outerWidth;
+                    childrenWidthTotal += childWidth;
 
-				this.$ellipsis = this.$item.clone().removeClass().addClass(this.namespace + '-ellipsis').html(this.options.ellipsis);
+                    if (childrenWidthTotal + dropdownWidth > width) {
+                        this._showDropdown(i);
+                    } else {
+                        this._hideDropdown(i);
+                    }
+                }
+            }
+        }, {
+            key: "resize",
+            value: function resize() {
+                this._trigger('resize');
 
-				if (this.options.overflow === 'right') {
-					this.$ellipsis.insertBefore(this.$dropdownWrap).hide();
-				} else {
-					this.$ellipsis.insertAfter(this.$dropdownWrap).hide();
-				}
-			}
-		}, {
-			key: "_showDropdown",
-			value: function _showDropdown(i) {
-				(0, _jQuery2.default)(this.childrenInfo[i]._this).hide();
-				this.$dropdownWrap.css("display", "inline-block");
-				this.$ellipsis.css("display", "inline-block");
-				this.childrenInfo[i].text.css("display", "inline-block");
-			}
-		}, {
-			key: "_hideDropdown",
-			value: function _hideDropdown(i) {
-				(0, _jQuery2.default)(this.childrenInfo[i]._this).css("display", "inline-block");
-				this.childrenInfo[i].text.hide();
-				this.$dropdownWrap.hide();
-				this.$ellipsis.hide();
-			}
-		}, {
-			key: "_getWidth",
-			value: function _getWidth() {
-				var width = 0;
-				this.$element.children().each(function () {
-					if ((0, _jQuery2.default)(this).css('display') === 'inline-block' && (0, _jQuery2.default)(this).css('float') === 'none') {
-						width += this.WidthPlus;
-					}
-				});
-				return this.$element.width() - width;
-			}
-		}, {
-			key: "build",
-			value: function build() {
-				var childrenWidthTotal = 0,
-				    thisChildrenWidth = 0,
-				    thisWidth = 0;
+                this.render();
+            }
+        }, {
+            key: "getDropdownWidth",
+            value: function getDropdownWidth() {
+                return this.$dropdownWrap.outerWidth() + (this.options.ellipsis ? this.$ellipsis.outerWidth() : 0);
+            }
+        }, {
+            key: "getWidth",
+            value: function getWidth() {
+                var width = 0;
+                this.$element.children().each(function () {
+                    if ((0, _jQuery2.default)(this).css('display') === 'inline-block' && (0, _jQuery2.default)(this).css('float') === 'none') {
+                        width += this.gap;
+                    }
+                });
+                return this.$element.width() - width;
+            }
+        }, {
+            key: "_createEllipsis",
+            value: function _createEllipsis() {
+                if (!this.options.ellipsis) {
+                    return;
+                }
 
-				for (var i = 0; i < this.length; i++) {
-					thisWidth = this._getWidth();
-					thisChildrenWidth = this.childrenInfo[i].thisOuterWidth;
-					childrenWidthTotal += thisChildrenWidth;
+                this.$ellipsis = this.$firstChild.clone().removeClass().addClass(this.namespace + '-ellipsis').html(this.options.ellipsis);
 
-					if (childrenWidthTotal + this.dropdownWidth > thisWidth) {
-						this._showDropdown(i);
-					} else {
-						this._hideDropdown(i);
-					}
-				}
-			}
-		}, {
-			key: "resize",
-			value: function resize() {
-				this._trigger('resize');
+                if (this.options.overflow === 'right') {
+                    this.$ellipsis.insertBefore(this.$dropdownWrap).hide();
+                } else {
+                    this.$ellipsis.insertAfter(this.$dropdownWrap).hide();
+                }
+            }
+        }, {
+            key: "_createDropdownItem",
+            value: function _createDropdownItem() {
+                for (var i = 0, l = this.childrenLength; i < l; i++) {
+                    this.childrenInfo[i].$content.appendTo(this.$dropdownMenu).hide();
+                }
+            }
+        }, {
+            key: "_showDropdown",
+            value: function _showDropdown(i) {
+                this.childrenInfo[i].$content.css("display", "inline-block");
+                this.childrenInfo[i].$this.hide();
+                this.$dropdownWrap.css("display", "inline-block");
+                this.$ellipsis.css("display", "inline-block");
+            }
+        }, {
+            key: "_hideDropdown",
+            value: function _hideDropdown(i) {
+                this.childrenInfo[i].$this.css("display", "inline-block");
+                this.childrenInfo[i].$content.hide();
+                this.$dropdownWrap.hide();
+                this.$ellipsis.hide();
+            }
+        }, {
+            key: "_throttle",
+            value: function _throttle(func, wait) {
+                var _now = Date.now || function () {
+                    return new Date().getTime();
+                };
 
-				this.build();
-			}
-		}, {
-			key: "_throttle",
-			value: function _throttle(func, wait) {
-				var _now = Date.now || function () {
-					return new Date().getTime();
-				};
+                var context = undefined,
+                    args = undefined,
+                    result = undefined;
+                var timeout = null;
+                var previous = 0;
 
-				var context = undefined,
-				    args = undefined,
-				    result = undefined;
-				var timeout = null;
-				var previous = 0;
+                var later = function later() {
+                    previous = _now();
+                    timeout = null;
+                    result = func.apply(context, args);
+                    context = args = null;
+                };
 
-				var later = function later() {
-					previous = _now();
-					timeout = null;
-					result = func.apply(context, args);
-					context = args = null;
-				};
+                return function () {
+                    var now = _now();
 
-				return function () {
-					var now = _now();
+                    var remaining = wait - (now - previous);
+                    context = this;
+                    args = arguments;
 
-					var remaining = wait - (now - previous);
-					context = this;
-					args = arguments;
+                    if (remaining <= 0) {
+                        clearTimeout(timeout);
+                        timeout = null;
+                        previous = now;
+                        result = func.apply(context, args);
+                        context = args = null;
+                    } else if (!timeout) {
+                        timeout = setTimeout(later, remaining);
+                    }
 
-					if (remaining <= 0) {
-						clearTimeout(timeout);
-						timeout = null;
-						previous = now;
-						result = func.apply(context, args);
-						context = args = null;
-					} else if (!timeout) {
-						timeout = setTimeout(later, remaining);
-					}
+                    return result;
+                };
+            }
+        }, {
+            key: "_trigger",
+            value: function _trigger(eventType) {
+                for (var _len = arguments.length, params = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+                    params[_key - 1] = arguments[_key];
+                }
 
-					return result;
-				};
-			}
-		}, {
-			key: "destroy",
-			value: function destroy() {
-				this.$element.children().css("display", "");
-				this.$dropdownWrap.remove();
+                var data = [this].concat(params);
+                this.$element.trigger(NAME + '::' + eventType, data);
+                eventType = eventType.replace(/\b\w+\b/g, function (word) {
+                    return word.substring(0, 1).toUpperCase() + word.substring(1);
+                });
+                var onFunction = 'on' + eventType;
 
-				if (this.options.ellipsis) {
-					this.$ellipsis.remove();
-				}
+                if (typeof this.options[onFunction] === 'function') {
+                    this.options[onFunction].apply(this, params);
+                }
+            }
+        }, {
+            key: "destroy",
+            value: function destroy() {
+                this.$element.children().css("display", "");
+                this.$dropdownWrap.remove();
 
-				this.createDropList = false;
-				this.$element.data(NAME, null);
-				(0, _jQuery2.default)(window).off("resize");
-				(0, _jQuery2.default)(window).off(".asBreadcrumbs");
+                if (this.options.ellipsis) {
+                    this.$ellipsis.remove();
+                }
 
-				this._trigger('destroy');
-			}
-		}], [{
-			key: "_jQueryInterface",
-			value: function _jQueryInterface(options) {
-				"use strict";
+                this.isCreated = false;
+                this.$element.data(NAME, null);
+                (0, _jQuery2.default)(window).off("resize");
+                (0, _jQuery2.default)(window).off(".asBreadcrumbs");
 
-				var _this2 = this;
+                this._trigger('destroy');
+            }
+        }], [{
+            key: "_jQueryInterface",
+            value: function _jQueryInterface(options) {
+                "use strict";
 
-				for (var _len2 = arguments.length, params = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-					params[_key2 - 1] = arguments[_key2];
-				}
+                var _this2 = this;
 
-				if (typeof options === 'string') {
-					var _ret = function () {
-						var method = options;
+                for (var _len2 = arguments.length, params = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+                    params[_key2 - 1] = arguments[_key2];
+                }
 
-						if (/^\_/.test(method)) {
-							return {
-								v: false
-							};
-						} else if (/^(get)/.test(method)) {
-							var api = _this2.first().data(NAME);
+                if (typeof options === 'string') {
+                    var _ret = function () {
+                        var method = options;
 
-							if (api && typeof api[method] === 'function') {
-								return {
-									v: api[method].apply(api, params)
-								};
-							}
-						} else {
-							return {
-								v: _this2.each(function () {
-									var api = _jQuery2.default.data(this, NAME);
+                        if (/^\_/.test(method)) {
+                            return {
+                                v: false
+                            };
+                        } else if (/^(get)/.test(method)) {
+                            var api = _this2.first().data(NAME);
 
-									if (api && typeof api[method] === 'function') {
-										api[method].apply(api, params);
-									}
-								})
-							};
-						}
-					}();
+                            if (api && typeof api[method] === 'function') {
+                                return {
+                                    v: api[method].apply(api, params)
+                                };
+                            }
+                        } else {
+                            return {
+                                v: _this2.each(function () {
+                                    var api = _jQuery2.default.data(this, NAME);
 
-					if ((typeof _ret === "undefined" ? "undefined" : babelHelpers.typeof(_ret)) === "object") return _ret.v;
-				} else {
-					return this.each(function () {
-						if (!_jQuery2.default.data(this, NAME)) {
-							_jQuery2.default.data(this, NAME, new asBreadcrumbs(this, options));
-						}
-					});
-				}
-			}
-		}]);
-		return asBreadcrumbs;
-	}();
+                                    if (api && typeof api[method] === 'function') {
+                                        api[method].apply(api, params);
+                                    }
+                                })
+                            };
+                        }
+                    }();
 
-	_jQuery2.default.fn[NAME] = asBreadcrumbs._jQueryInterface;
-	_jQuery2.default.fn[NAME].constructor = asBreadcrumbs;
+                    if ((typeof _ret === "undefined" ? "undefined" : babelHelpers.typeof(_ret)) === "object") return _ret.v;
+                } else {
+                    return this.each(function () {
+                        if (!_jQuery2.default.data(this, NAME)) {
+                            _jQuery2.default.data(this, NAME, new asBreadcrumbs(this, options));
+                        }
+                    });
+                }
+            }
+        }]);
+        return asBreadcrumbs;
+    }();
 
-	_jQuery2.default.fn[NAME].noConflict = function () {
-		_jQuery2.default.fn[NAME] = JQUERY_NO_CONFLICT;
-		return asBreadcrumbs._jQueryInterface;
-	};
+    _jQuery2.default.fn[NAME] = asBreadcrumbs._jQueryInterface;
+    _jQuery2.default.fn[NAME].constructor = asBreadcrumbs;
 
-	exports.default = asBreadcrumbs;
+    _jQuery2.default.fn[NAME].noConflict = function () {
+        _jQuery2.default.fn[NAME] = JQUERY_NO_CONFLICT;
+        return asBreadcrumbs._jQueryInterface;
+    };
+
+    exports.default = asBreadcrumbs;
 });

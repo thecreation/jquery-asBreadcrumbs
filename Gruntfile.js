@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function (grunt) {
+module.exports = function(grunt) {
 
     // Project configuration.
     grunt.initConfig({
@@ -40,7 +40,7 @@ module.exports = function (grunt) {
             options: {
                 sourceMap: false,
                 presets: ["es2015"],
-                plugins: ["transform-es2015-modules-umd","external-helpers-2"]
+                plugins: ["transform-es2015-modules-umd", "external-helpers-2"]
             },
             dist: {
                 files: [{
