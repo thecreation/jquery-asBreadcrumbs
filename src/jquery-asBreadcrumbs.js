@@ -12,11 +12,11 @@ const DEFAULT = {
     dropdown() {
         return '<div class=\"dropdown\">' +
             '<a href=\"javascript:void(0);\" class=\"' + this.namespace + '-toggle\" data-toggle=\"dropdown\"><i class=\"' + this.dropicon + '\"></i></a>' +
-            '<ul class=\"' + this.namespace + '-menu dropdown-menu\"></ul>' +
+            '<div class=\"' + this.namespace + '-menu dropdown-menu\"></div>' +
             '</div>';
     },
     dropdownContent(value) {
-        return '<li class=\"dropdown-item\">' + value + '</li>';
+        return '<a class=\"dropdown-item\">' + value + '</a>';
     },
     getItem($parent) {
         return $parent.children();
@@ -58,7 +58,7 @@ class asBreadcrumbs {
 
     init() {
         let self = this;
-        
+
         this.$element.addClass(this.namespace + '-' + this.options.overflow);
 
         this.generateChildrenInfo();
@@ -76,21 +76,22 @@ class asBreadcrumbs {
         this._trigger('ready');
     }
 
-    generateChildrenInfo(){
-      let self = this;
-      this.$children.each(function() {
-        let $this = $(this);
-        self.childrenInfo.push({
-          $this: $this,
-          outerWidth: $this.outerWidth(),
-          $content: $(self.options.dropdownContent($this.text()))
-        });
-      });
-      if (this.options.overflow === "left") {
-        this.childrenInfo.reverse();
-      }
+    generateChildrenInfo() {
+        let self = this;
 
-      this.childrenLength = this.childrenInfo.length;
+        this.$children.each(function () {
+            let $this = $(this);
+            self.childrenInfo.push({
+                $this: $this,
+                outerWidth: $this.outerWidth(),
+                $content: $(self.options.dropdownContent($this.text())).attr("href", self.options.getItem($this).attr("href"))
+            });
+        });
+        if (this.options.overflow === "left") {
+            this.childrenInfo.reverse();
+        }
+
+        this.childrenLength = this.childrenInfo.length;
     }
 
     createDropdown() {
@@ -141,14 +142,14 @@ class asBreadcrumbs {
         this.render();
     }
 
-    getDropdownWidth(){
-      return this.$dropdownWrap.outerWidth() + (this.options.ellipsis ? this.$ellipsis.outerWidth() : 0);
+    getDropdownWidth() {
+        return this.$dropdownWrap.outerWidth() + (this.options.ellipsis ? this.$ellipsis.outerWidth() : 0);
     }
 
     getWidth() {
         let width = 0;
-       
-        this.$element.children().each(function() {
+
+        this.$element.children().each(function () {
             if ($(this).css('display') === 'inline-block' && $(this).css('float') === 'none') {
                 width += this.gap;
             }
@@ -162,7 +163,7 @@ class asBreadcrumbs {
         }
 
         this.$ellipsis = this.$firstChild.clone().removeClass().addClass(this.namespace + '-ellipsis').html(this.options.ellipsis);
-      
+
         if (this.options.overflow === 'right') {
             this.$ellipsis.insertBefore(this.$dropdownWrap).hide();
         } else {
@@ -170,17 +171,17 @@ class asBreadcrumbs {
         }
     }
 
-    _createDropdownItem(){
-      for (let i = 0, l = this.childrenLength; i < l; i++) {
-        this.childrenInfo[i].$content.appendTo(this.$dropdownMenu).hide();
-      }
+    _createDropdownItem() {
+        for (let i = 0, l = this.childrenLength; i < l; i++) {
+            this.childrenInfo[i].$content.appendTo(this.$dropdownMenu).hide();
+        }
     }
 
     _showDropdown(i) {
-      this.childrenInfo[i].$content.css("display", "inline-block");
-      this.childrenInfo[i].$this.hide();
-      this.$dropdownWrap.css("display", "inline-block");
-      this.$ellipsis.css("display", "inline-block");
+        this.childrenInfo[i].$content.css("display", "inline-block");
+        this.childrenInfo[i].$this.hide();
+        this.$dropdownWrap.css("display", "inline-block");
+        this.$ellipsis.css("display", "inline-block");
     }
 
     _hideDropdown(i) {
@@ -191,19 +192,19 @@ class asBreadcrumbs {
     }
 
     _throttle(func, wait) {
-        let _now = Date.now || function() {
+        let _now = Date.now || function () {
             return new Date().getTime();
         };
         let context, args, result;
         let timeout = null;
         let previous = 0;
-        let later = function() {
+        let later = function () {
             previous = _now();
             timeout = null;
             result = func.apply(context, args);
             context = args = null;
         };
-        return function() {
+        return function () {
             let now = _now();
             let remaining = wait - (now - previous);
             context = this;
@@ -265,7 +266,7 @@ class asBreadcrumbs {
                     return api[method].apply(api, params);
                 }
             } else {
-                return this.each(function() {
+                return this.each(function () {
                     let api = $.data(this, NAME);
                     if (api && typeof api[method] === 'function') {
                         api[method].apply(api, params);
@@ -273,7 +274,7 @@ class asBreadcrumbs {
                 });
             }
         } else {
-            return this.each(function() {
+            return this.each(function () {
                 if (!$.data(this, NAME)) {
                     $.data(this, NAME, new asBreadcrumbs(this, options));
                 }

@@ -1,3 +1,5 @@
+"use strict";
+
 (function (global, factory) {
     if (typeof define === "function" && define.amd) {
         define(["exports", "jQuery"], factory);
@@ -11,8 +13,6 @@
         global.jqueryAsBreadcrumbs = mod.exports;
     }
 })(this, function (exports, _jQuery) {
-    "use strict";
-
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
@@ -27,10 +27,10 @@
         dropicon: "caret",
         responsive: true,
         dropdown: function dropdown() {
-            return '<div class=\"dropdown\">' + '<a href=\"javascript:void(0);\" class=\"' + this.namespace + '-toggle\" data-toggle=\"dropdown\"><i class=\"' + this.dropicon + '\"></i></a>' + '<ul class=\"' + this.namespace + '-menu dropdown-menu\"></ul>' + '</div>';
+            return '<div class=\"dropdown\">' + '<a href=\"javascript:void(0);\" class=\"' + this.namespace + '-toggle\" data-toggle=\"dropdown\"><i class=\"' + this.dropicon + '\"></i></a>' + '<div class=\"' + this.namespace + '-menu dropdown-menu\"></div>' + '</div>';
         },
         dropdownContent: function dropdownContent(value) {
-            return '<li class=\"dropdown-item\">' + value + '</li>';
+            return '<a class=\"dropdown-item\">' + value + '</a>';
         },
         getItem: function getItem($parent) {
             return $parent.children();
@@ -92,7 +92,7 @@
                     self.childrenInfo.push({
                         $this: $this,
                         outerWidth: $this.outerWidth(),
-                        $content: (0, _jQuery2.default)(self.options.dropdownContent($this.text()))
+                        $content: (0, _jQuery2.default)(self.options.dropdownContent($this.text())).attr("href", self.options.getItem($this).attr("href"))
                     });
                 });
 
