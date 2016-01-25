@@ -1,6 +1,6 @@
-/*! jQuery asBreadcrumbs - v0.1.0 - 2015-05-08
+/*! jQuery asBreadcrumbs - v0.1.0 - 2016-01-25
 * https://github.com/amazingSurge/jquery-asBreadcrumbs
-* Copyright (c) 2015 amazingSurge; Licensed GPL */
+* Copyright (c) 2016 amazingSurge; Licensed GPL */
 (function($, document, window, undefined) {
     "use strict";
 
@@ -12,13 +12,23 @@
 
         this.options = $.extend({}, Plugin.defaults, options, this.$element.data());
 
-        this._plugin = pluginName;
+        // this._plugin = NAME;
         this.namespace = this.options.namespace;
 
         this.$element.addClass(this.namespace);
         // flag
         this.disabled = false;
         this.initialized = false;
+        this.isCreated = false;
+
+        this.$children = this.options.getItem(this.$element);
+        this.$firstChild = this.$children.eq(0);
+
+        this.$dropdownWrap = null;
+        this.$dropdownMenu = null;
+
+        this.gap = 6;
+        this.childrenInfo = [];
 
         this._trigger('init');
         this.init();
@@ -29,24 +39,12 @@
         init: function() {
             var self = this;
 
-            this.createDropList = false;
-            this.childrenWithWidths = [];
-            this.current = 0;
-            this.dropdownWidth = 0;
-
-            var children = this.options.getItem(this.$element);
-            children.each(function() {
-                self.childrenWithWidths.push([$(this), $(this).outerWidth()]);
-            });
-            this.length = this.childrenWithWidths.length;
-
             this.$element.addClass(this.namespace + '-' + this.options.overflow);
 
-            // In order to get the dropdownWidth
+            this.generateChildrenInfo();
             this.createDropdown();
-            this.deleteDropdown();
 
-            this.calculate();
+            this.render();
 
             if (this.options.responsive) {
                 $(window).on('resize', this._throttle(function() {
@@ -73,99 +71,112 @@
                 this.options[onFunction].apply(this, method_arguments);
             }
         },
+        generateChildrenInfo: function() {
+            var self = this;
+
+            this.$children.each(function() {
+                var $this = $(this);
+                self.childrenInfo.push({
+                    $this: $this,
+                    outerWidth: $this.outerWidth(),
+                    $content: $(self.options.dropdownContent($this.text())).attr("href", self.options.getItem($this).attr("href"))
+                });
+            });
+            if (this.options.overflow === "left") {
+                this.childrenInfo.reverse();
+            }
+
+            this.childrenLength = this.childrenInfo.length;
+        },
         createDropdown: function() {
-            if (this.createDropList === true) {
+            if (this.isCreated === true) {
                 return;
             }
-            var dropdown = this.options.dropdown();
-            this.$dropdownWrap = this.$element.children().eq(0).clone().removeClass().addClass(this.namespace + '-dropdown').html(dropdown);
 
-            if (this.options.ellipsis) {
-                this.$ellipsis = this.$element.children().eq(0).clone().removeClass().addClass(this.namespace + '-ellipsis').html(this.options.ellipsis);
-            }
+            var dropdown = this.options.dropdown();
+            this.$dropdownWrap = this.$firstChild.clone().removeClass().addClass(this.namespace + '-dropdown dropdown').html(dropdown).hide();
+            this.$dropdownMenu = this.$dropdownWrap.find('.dropdown-menu');
+
+            this._createDropdownItem();
 
             if (this.options.overflow === 'right') {
                 this.$dropdownWrap.appendTo(this.$element);
-
-                if (this.options.ellipsis) {
-                    this.$ellipsis.insertBefore(this.$dropdownWrap);
-                }
             } else {
                 this.$dropdownWrap.prependTo(this.$element);
-
-                if (this.options.ellipsis) {
-                    this.$ellipsis.insertAfter(this.$dropdownWrap);
-                }
             }
 
-            this.dropdownWidth = this.$dropdownWrap.outerWidth() + (this.options.ellipsis ? this.$ellipsis.outerWidth() : 0);
-            this.createDropList = true;
+            this._createEllipsis();
+
+            this.isCreated = true;
         },
-        deleteDropdown: function() {
-            if (this.current > 1) {
-                return;
-            }
+        render: function() {
+            var dropdownWidth = this.getDropdownWidth(),
+                childrenWidthTotal = 0,
+                childWidth = 0,
+                width = 0;
 
-            this.$element.find('.' + this.namespace + '-dropdown').remove();
-            if (this.options.ellipsis) {
-                this.$element.find('.' + this.namespace + '-ellipsis').remove();
-            }
-            this.createDropList = false;
-        },
-        _getParameters: function() {
-            var width = 0;
-            this.$element.children().each(function() {
-                if ($(this).css('display') === 'inline-block' && $(this).css('float') === 'none') {
-                    width += 6;
-                }
-            });
-            this.width = this.$element.width() - width;
-            if (this.createDropList) {
-                this.childrenWidthTotal = this.$dropdownWrap.outerWidth() + (this.options.ellipsis ? 0 : this.$ellipsis.outerWidth());
-            } else {
-                this.childrenWidthTotal = 0;
-            }
-        },
-        calculate: function() {
-            this._getParameters();
+            for (var i = 0, l = this.childrenLength; i < l; i++) {
 
-            var real, reverse;
-            for (var i = 0; i < this.length; i++) {
-                this.current = this.$element.find('.' + this.namespace + '-menu').children().length;
-                if (this.options.overflow === "left") {
-                    real = this.length - i - 1;
-                    reverse = this.current - 1;
+                width = this.getWidth();
+                childWidth = this.childrenInfo[i].outerWidth;
+
+                childrenWidthTotal += childWidth;
+
+                if (childrenWidthTotal + dropdownWidth > width) {
+                    this._showDropdown(i);
                 } else {
-                    real = i;
-                    reverse = this.length - this.current;
-                }
-
-                this.childrenWidthTotal += this.childrenWithWidths[real][1];
-                if (this.childrenWidthTotal + this.dropdownWidth > this.width) {
-                    this.createDropdown();
-                    $(this.childrenWithWidths[real][0]).appendTo(this.$element.find('.' + this.namespace + '-menu'));
-                } else if (real === reverse && this.childrenWidthTotal + this.dropdownWidth < this.width) {
-                    if (this.options.overflow === "left") {
-                        if (this.options.ellipsis) {
-                            $(this.childrenWithWidths[reverse][0].insertAfter(this.$ellipsis));
-                        } else {
-                            $(this.childrenWithWidths[reverse][0].insertAfter(this.$dropdownWrap));
-                        }
-                    } else {
-                        if (this.options.ellipsis) {
-                            $(this.childrenWithWidths[reverse][0].insertBefore(this.$ellipsis));
-                        } else {
-                            $(this.childrenWithWidths[reverse][0].insertBefore(this.$dropdownWrap));
-                        }
-                    }
-                    this.deleteDropdown();
+                    this._hideDropdown(i);
                 }
             }
         },
         resize: function() {
             this._trigger('resize');
 
-            this.calculate();
+            this.render();
+        },
+        getDropdownWidth: function() {
+            return this.$dropdownWrap.outerWidth() + (this.options.ellipsis ? this.$ellipsis.outerWidth() : 0);
+        },
+        getWidth: function() {
+            var width = 0,
+                self = this;
+
+            this.$element.children().each(function() {
+                if ($(this).css('display') === 'inline-block' && $(this).css('float') === 'none') {
+                    width += self.gap;
+                }
+            });
+            return this.$element.width() - width;
+        },
+        _createEllipsis: function() {
+            if (!this.options.ellipsis) {
+                return;
+            }
+
+            this.$ellipsis = this.$firstChild.clone().removeClass().addClass(this.namespace + '-ellipsis').html(this.options.ellipsis);
+
+            if (this.options.overflow === 'right') {
+                this.$ellipsis.insertBefore(this.$dropdownWrap).hide();
+            } else {
+                this.$ellipsis.insertAfter(this.$dropdownWrap).hide();
+            }
+        },
+        _createDropdownItem: function() {
+            for (var i = 0, l = this.childrenLength; i < l; i++) {
+                this.childrenInfo[i].$content.appendTo(this.$dropdownMenu).hide();
+            }
+        },
+        _showDropdown: function(i) {
+            this.childrenInfo[i].$content.css("display", "inline-block");
+            this.childrenInfo[i].$this.hide();
+            this.$dropdownWrap.css("display", "inline-block");
+            this.$ellipsis.css("display", "inline-block");
+        },
+        _hideDropdown: function(i) {
+            this.childrenInfo[i].$this.css("display", "inline-block");
+            this.childrenInfo[i].$content.hide();
+            this.$dropdownWrap.hide();
+            this.$ellipsis.hide();
         },
         _throttle: function(func, wait) {
             var _now = Date.now || function() {
@@ -197,11 +208,19 @@
                 return result;
             };
         },
-        destory: function() {
+        destroy: function() {
             // detached events first
             // then remove all js generated html
+            this.$element.children().css("display", "");
+            this.$dropdownWrap.remove();
+            if (this.options.ellipsis) {
+                this.$ellipsis.remove();
+            }
+            this.isCreated = false;
             this.$element.data(pluginName, null);
-            this._trigger('destory');
+            $(window).off("resize");
+            $(window).off(".asBreadcrumbs");
+            this._trigger('destroy');
         }
     };
 
@@ -215,10 +234,12 @@
         dropdown: function() {
             return '<div class=\"dropdown\">' +
                 '<a href=\"javascript:void(0);\" class=\"' + this.namespace + '-toggle\" data-toggle=\"dropdown\"><i class=\"' + this.dropicon + '\"></i></a>' +
-                '<ul class=\"' + this.namespace + '-menu dropdown-menu\"></ul>' +
+                '<div class=\"' + this.namespace + '-menu dropdown-menu\"></div>' +
                 '</div>';
         },
-
+        dropdownContent: function(value) {
+            return '<a class=\"dropdown-item\">' + value + '</a>';
+        },
         getItem: function($parent) {
             return $parent.children();
         },

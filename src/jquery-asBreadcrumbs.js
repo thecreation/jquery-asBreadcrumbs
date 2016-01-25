@@ -5,12 +5,12 @@
  * Copyright (c) 2015 amazingSurge
  * Licensed under the MIT license.
  */
-(function ($, document, window, undefined) {
+(function($, document, window, undefined) {
     "use strict";
 
     var pluginName = 'asBreadcrumbs';
 
-    var Plugin = $[pluginName] = function (element, options) {
+    var Plugin = $[pluginName] = function(element, options) {
         this.element = element;
         this.$element = $(element);
 
@@ -40,7 +40,7 @@
 
     Plugin.prototype = {
         constructor: Plugin,
-        init: function () {
+        init: function() {
             var self = this;
 
             this.$element.addClass(this.namespace + '-' + this.options.overflow);
@@ -51,7 +51,7 @@
             this.render();
 
             if (this.options.responsive) {
-                $(window).on('resize', this._throttle(function () {
+                $(window).on('resize', this._throttle(function() {
                     self.resize.call(self);
                 }, 250));
             }
@@ -59,7 +59,7 @@
             this.initialized = true;
             this._trigger('ready');
         },
-        _trigger: function (eventType) {
+        _trigger: function(eventType) {
             var method_arguments = Array.prototype.slice.call(arguments, 1),
                 data = [this].concat(method_arguments);
 
@@ -67,7 +67,7 @@
             this.$element.trigger(pluginName + '::' + eventType, data);
 
             // callback
-            eventType = eventType.replace(/\b\w+\b/g, function (word) {
+            eventType = eventType.replace(/\b\w+\b/g, function(word) {
                 return word.substring(0, 1).toUpperCase() + word.substring(1);
             });
             var onFunction = 'on' + eventType;
@@ -75,10 +75,10 @@
                 this.options[onFunction].apply(this, method_arguments);
             }
         },
-        generateChildrenInfo: function () {
+        generateChildrenInfo: function() {
             var self = this;
 
-            this.$children.each(function () {
+            this.$children.each(function() {
                 var $this = $(this);
                 self.childrenInfo.push({
                     $this: $this,
@@ -92,7 +92,7 @@
 
             this.childrenLength = this.childrenInfo.length;
         },
-        createDropdown: function () {
+        createDropdown: function() {
             if (this.isCreated === true) {
                 return;
             }
@@ -113,7 +113,7 @@
 
             this.isCreated = true;
         },
-        render: function () {
+        render: function() {
             var dropdownWidth = this.getDropdownWidth(),
                 childrenWidthTotal = 0,
                 childWidth = 0,
@@ -133,26 +133,26 @@
                 }
             }
         },
-        resize: function () {
+        resize: function() {
             this._trigger('resize');
 
             this.render();
         },
-        getDropdownWidth: function () {
+        getDropdownWidth: function() {
             return this.$dropdownWrap.outerWidth() + (this.options.ellipsis ? this.$ellipsis.outerWidth() : 0);
         },
-        getWidth: function () {
+        getWidth: function() {
             var width = 0,
                 self = this;
 
-            this.$element.children().each(function () {
+            this.$element.children().each(function() {
                 if ($(this).css('display') === 'inline-block' && $(this).css('float') === 'none') {
                     width += self.gap;
                 }
             });
             return this.$element.width() - width;
         },
-        _createEllipsis: function () {
+        _createEllipsis: function() {
             if (!this.options.ellipsis) {
                 return;
             }
@@ -165,37 +165,37 @@
                 this.$ellipsis.insertAfter(this.$dropdownWrap).hide();
             }
         },
-        _createDropdownItem: function () {
+        _createDropdownItem: function() {
             for (var i = 0, l = this.childrenLength; i < l; i++) {
                 this.childrenInfo[i].$content.appendTo(this.$dropdownMenu).hide();
             }
         },
-        _showDropdown: function (i) {
+        _showDropdown: function(i) {
             this.childrenInfo[i].$content.css("display", "inline-block");
             this.childrenInfo[i].$this.hide();
             this.$dropdownWrap.css("display", "inline-block");
             this.$ellipsis.css("display", "inline-block");
         },
-        _hideDropdown: function (i) {
+        _hideDropdown: function(i) {
             this.childrenInfo[i].$this.css("display", "inline-block");
             this.childrenInfo[i].$content.hide();
             this.$dropdownWrap.hide();
             this.$ellipsis.hide();
         },
-        _throttle: function (func, wait) {
-            var _now = Date.now || function () {
+        _throttle: function(func, wait) {
+            var _now = Date.now || function() {
                 return new Date().getTime();
             };
             var context, args, result;
             var timeout = null;
             var previous = 0;
-            var later = function () {
+            var later = function() {
                 previous = _now();
                 timeout = null;
                 result = func.apply(context, args);
                 context = args = null;
             };
-            return function () {
+            return function() {
                 var now = _now();
                 var remaining = wait - (now - previous);
                 context = this;
@@ -212,7 +212,7 @@
                 return result;
             };
         },
-        destroy: function () {
+        destroy: function() {
             // detached events first
             // then remove all js generated html
             this.$element.children().css("display", "");
@@ -235,16 +235,16 @@
         dropicon: "caret",
         responsive: true,
 
-        dropdown: function () {
+        dropdown: function() {
             return '<div class=\"dropdown\">' +
                 '<a href=\"javascript:void(0);\" class=\"' + this.namespace + '-toggle\" data-toggle=\"dropdown\"><i class=\"' + this.dropicon + '\"></i></a>' +
                 '<div class=\"' + this.namespace + '-menu dropdown-menu\"></div>' +
                 '</div>';
         },
-        dropdownContent: function (value) {
+        dropdownContent: function(value) {
             return '<a class=\"dropdown-item\">' + value + '</a>';
         },
-        getItem: function ($parent) {
+        getItem: function($parent) {
             return $parent.children();
         },
 
@@ -253,7 +253,7 @@
         onReady: null
     };
 
-    $.fn[pluginName] = function (options) {
+    $.fn[pluginName] = function(options) {
         if (typeof options === 'string') {
             var method = options;
             var method_arguments = Array.prototype.slice.call(arguments, 1);
@@ -266,7 +266,7 @@
                     return api[method].apply(api, method_arguments);
                 }
             } else {
-                return this.each(function () {
+                return this.each(function() {
                     var api = $.data(this, pluginName);
                     if (api && typeof api[method] === 'function') {
                         api[method].apply(api, method_arguments);
@@ -274,7 +274,7 @@
                 });
             }
         } else {
-            return this.each(function () {
+            return this.each(function() {
                 if (!$.data(this, pluginName)) {
                     $.data(this, pluginName, new Plugin(this, options));
                 }
