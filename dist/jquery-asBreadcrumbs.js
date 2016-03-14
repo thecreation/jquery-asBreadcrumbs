@@ -1,4 +1,4 @@
-/*! jQuery asBreadcrumbs - v0.1.0 - 2016-01-25
+/*! jQuery asBreadcrumbs - v0.1.0 - 2016-03-14
 * https://github.com/amazingSurge/jquery-asBreadcrumbs
 * Copyright (c) 2016 amazingSurge; Licensed GPL */
 (function($, document, window, undefined) {
@@ -167,9 +167,9 @@
             }
         },
         _showDropdown: function(i) {
-            this.childrenInfo[i].$content.css("display", "inline-block");
+            this.childrenInfo[i].$content.show();
             this.childrenInfo[i].$this.hide();
-            this.$dropdownWrap.css("display", "inline-block");
+            this.$dropdownWrap.show();
             this.$ellipsis.css("display", "inline-block");
         },
         _hideDropdown: function(i) {
