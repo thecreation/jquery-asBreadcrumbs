@@ -160,10 +160,11 @@
         }, {
             key: "getWidth",
             value: function getWidth() {
-                var width = 0;
+                var width = 0,
+                    self = this;
                 this.$element.children().each(function () {
                     if ((0, _jQuery2.default)(this).css('display') === 'inline-block' && (0, _jQuery2.default)(this).css('float') === 'none') {
-                        width += this.gap;
+                        width += self.gap;
                     }
                 });
                 return this.$element.width() - width;
@@ -193,9 +194,9 @@
         }, {
             key: "_showDropdown",
             value: function _showDropdown(i) {
-                this.childrenInfo[i].$content.css("display", "inline-block");
+                this.childrenInfo[i].$content.show();
                 this.childrenInfo[i].$this.hide();
-                this.$dropdownWrap.css("display", "inline-block");
+                this.$dropdownWrap.show();
                 this.$ellipsis.css("display", "inline-block");
             }
         }, {

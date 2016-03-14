@@ -147,11 +147,12 @@ class asBreadcrumbs {
     }
 
     getWidth() {
-        let width = 0;
+        let width = 0,
+            self = this;
 
         this.$element.children().each(function () {
             if ($(this).css('display') === 'inline-block' && $(this).css('float') === 'none') {
-                width += this.gap;
+                width += self.gap;
             }
         });
         return this.$element.width() - width;
@@ -178,9 +179,9 @@ class asBreadcrumbs {
     }
 
     _showDropdown(i) {
-        this.childrenInfo[i].$content.css("display", "inline-block");
+        this.childrenInfo[i].$content.show();
         this.childrenInfo[i].$this.hide();
-        this.$dropdownWrap.css("display", "inline-block");
+        this.$dropdownWrap.show();
         this.$ellipsis.css("display", "inline-block");
     }
 
