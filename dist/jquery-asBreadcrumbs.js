@@ -26,6 +26,7 @@
         ellipsis: "&#8230;",
         dropicon: "caret",
         responsive: true,
+        itemClass: "",
         dropdown: function dropdown() {
             return '<div class=\"dropdown\">' + '<a href=\"javascript:void(0);\" class=\"' + this.namespace + '-toggle\" data-toggle=\"dropdown\"><i class=\"' + this.dropicon + '\"></i></a>' + '<div class=\"' + this.namespace + '-menu dropdown-menu\"></div>' + '</div>';
         },
@@ -110,7 +111,7 @@
                 }
 
                 var dropdown = this.options.dropdown();
-                this.$dropdownWrap = this.$firstChild.clone().removeClass().addClass(this.namespace + '-dropdown dropdown').html(dropdown).hide();
+                this.$dropdownWrap = this.$firstChild.clone().removeClass().addClass(this.namespace + '-dropdown dropdown ' + this.options.itemClass).html(dropdown).hide();
                 this.$dropdownMenu = this.$dropdownWrap.find('.dropdown-menu');
 
                 this._createDropdownItem();
@@ -176,7 +177,7 @@
                     return;
                 }
 
-                this.$ellipsis = this.$firstChild.clone().removeClass().addClass(this.namespace + '-ellipsis').html(this.options.ellipsis);
+                this.$ellipsis = this.$firstChild.clone().removeClass().addClass(this.namespace + '-ellipsis ' + this.options.itemClass).html(this.options.ellipsis);
 
                 if (this.options.overflow === 'right') {
                     this.$ellipsis.insertBefore(this.$dropdownWrap).hide();
