@@ -27,7 +27,7 @@
             font-style: normal;
             text-decoration: none;
         }
-        
+
         .caret:before {
             content: '▼';
         }
@@ -87,7 +87,8 @@
                     $('#toc').toc();
                 })();
             $('.breadcrumb').asBreadcrumbs({
-                namespace: 'breadcrumb'
+                namespace: 'breadcrumb',
+                itemClass:"breadcrumb-item"
             });
 
             $(".destroy-btn").on("click",function(){
