@@ -3,9 +3,9 @@ import asBreadcrumbs from './asBreadcrumbs';
 import info from './info';
 
 const NAME = 'asBreadcrumbs';
-const OtherAsScrollbar = $.fn.asBreadcrumbs;
+const OtherAsBreadcrumbs = $.fn.asBreadcrumbs;
 
-$.fn.asBreadcrumbs = function jQueryAsScrollbar(options, ...args) {
+const jQueryAsBreadcrumbs = function(options, ...args) {
   if (typeof options === 'string') {
     let method = options;
 
@@ -33,10 +33,12 @@ $.fn.asBreadcrumbs = function jQueryAsScrollbar(options, ...args) {
   });
 };
 
+$.fn.asBreadcrumbs = jQueryAsBreadcrumbs;
+
 $.asBreadcrumbs = $.extend({
   setDefaults: asBreadcrumbs.setDefaults,
   noConflict: function() {
-    $.fn.asBreadcrumbs = OtherAsScrollbar;
-    return this;
+    $.fn.asBreadcrumbs = OtherAsBreadcrumbs;
+    return jQueryAsBreadcrumbs;
   }
 }, info);

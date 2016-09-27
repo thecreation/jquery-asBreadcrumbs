@@ -1,5 +1,5 @@
 /**
-* jQuery asBreadcrumbs v0.2.0
+* jQuery asBreadcrumbs v0.2.1
 * https://github.com/amazingSurge/jquery-asBreadcrumbs
 *
 * Copyright (c) amazingSurge
@@ -348,13 +348,13 @@ class asBreadcrumbs {
 }
 
 var info = {
-  version:'0.2.0'
+  version:'0.2.1'
 };
 
 const NAME = 'asBreadcrumbs';
-const OtherAsScrollbar = $.fn.asBreadcrumbs;
+const OtherAsBreadcrumbs = $.fn.asBreadcrumbs;
 
-$.fn.asBreadcrumbs = function jQueryAsScrollbar(options, ...args) {
+const jQueryAsBreadcrumbs = function(options, ...args) {
   if (typeof options === 'string') {
     let method = options;
 
@@ -382,10 +382,12 @@ $.fn.asBreadcrumbs = function jQueryAsScrollbar(options, ...args) {
   });
 };
 
+$.fn.asBreadcrumbs = jQueryAsBreadcrumbs;
+
 $.asBreadcrumbs = $.extend({
   setDefaults: asBreadcrumbs.setDefaults,
   noConflict: function() {
-    $.fn.asBreadcrumbs = OtherAsScrollbar;
-    return this;
+    $.fn.asBreadcrumbs = OtherAsBreadcrumbs;
+    return jQueryAsBreadcrumbs;
   }
 }, info);
