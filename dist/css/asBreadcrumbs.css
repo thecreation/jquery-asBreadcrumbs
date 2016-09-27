@@ -1,0 +1,26 @@
+/**
+* jQuery asBreadcrumbs v0.2.0
+* https://github.com/amazingSurge/jquery-asBreadcrumbs
+*
+* Copyright (c) amazingSurge
+* Released under the LGPL-3.0 license
+*/
+.breadcrumb {
+  list-style: none;
+}
+.breadcrumb > li {
+  display: inline-block;
+}
+.breadcrumb .is-hidden {
+  display: none;
+}
+.breadcrumb-ellipsis {
+  display: inline-block;
+}
+.breadcrumb-dropdown {
+  display: inline-block;
+}
+
+.breadcrumb > li.breadcrumb-ellipsis.is-hidden + li:before {
+  display: none;
+}

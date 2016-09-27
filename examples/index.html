@@ -1,0 +1,77 @@
+<!doctype html>
+<html class="no-js">
+<!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>asBreadcrumbs</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="../dist/css/asBreadcrumbs.css">
+  <style>
+    .container {
+      margin: 0 20px;
+    }
+  </style>
+</head>
+<body>
+  <!--[if lt IE 8]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+  <![endif]-->
+  <div class="container">
+    <h1>jQuery.asBreadcrumbs</h1>
+    <section>
+      <h2>Example</h2>
+      <p>You can pass these options as key/value object to $.asBreadcrumbs() method. </p>
+      <section>
+        <h3>Default</h3>
+        <div class="example">
+          <ol class="breadcrumb">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Getting Started</a></li>
+            <li><a href="#">Library</a></li>
+            <li><a href="#">Document</a></li>
+            <li><a href="#">Components</a></li>
+            <li><a href="#">JavaScript</a></li>
+            <li><a href="#">Customize</a></li>
+            <li class="active">Data</li>
+          </ol>
+          <ol class="breadcrumb" data-overflow="right">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Getting Started</a></li>
+            <li><a href="#">Library</a></li>
+            <li><a href="#">Document</a></li>
+            <li><a href="#">Components</a></li>
+            <li><a href="#">JavaScript</a></li>
+            <li><a href="#">Customize</a></li>
+            <li class="active">Data</li>
+          </ol>
+        </div>
+      </section>
+      <button class="init-btn">init</button>
+      <button class="destroy-btn">destroy</button>
+    </section>
+  </div>
+  <script src="js/jquery.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="../dist/jquery-asBreadcrumbs.js"></script>
+  <script type="text/javascript">
+    jQuery(function($) {
+      $('.breadcrumb').asBreadcrumbs({
+        namespace: 'breadcrumb'
+      });
+
+      $(".destroy-btn").on("click", function() {
+        $(".breadcrumb").asBreadcrumbs("destroy");
+      })
+
+      $(".init-btn").on("click", function() {
+        $(".breadcrumb").asBreadcrumbs({
+          namespace: 'breadcrumb'
+        });
+      })
+    });
+  </script>
+</body>
+</html>

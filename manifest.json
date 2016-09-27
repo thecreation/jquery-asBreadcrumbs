@@ -1,0 +1,11 @@
+{
+  "dest": "examples",
+  "ignoreError": false,
+  "packages": {
+    "npm:jquery": true,
+    "npm:bootstrap": {
+      "js": "dist/js/bootstrap.min.js",
+      "css": ["dist/css/bootstrap.min.css", "dist/css/bootstrap.min.css.map"]
+    }
+  }
+}
