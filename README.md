@@ -46,6 +46,11 @@ bower install jquery-asBreadcrumbs --save
 npm install jquery-asBreadcrumbs --save
 ```
 
+#### Install From Yarn
+```sh
+yarn add jquery-asBreadcrumbs
+```
+
 #### Build From Source
 If you want build from source:
 
@@ -172,11 +177,11 @@ You can also save the instances to variable for further use.
 
 ```javascript
 // call directly
-$().asBreadcrumbs('destory');
+$().asBreadcrumbs('destroy');
 
 // or
 var api = $().data('asBreadcrumbs');
-api.destory();
+api.destroy();
 ```
 
 #### destroy()

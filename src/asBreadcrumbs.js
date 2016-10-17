@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import DEFAULTS from './defaults';
 
-const NAME = 'asBreadcrumbs';
+const NAMESPACE = 'asBreadcrumbs';
 let instanceId = 0;
 
 /**
@@ -177,10 +177,10 @@ class asBreadcrumbs {
   }
 
   _trigger(eventType, ...params) {
-    let data = [this].concat(...params);
+    let data = [this].concat(params);
 
     // event
-    this.$element.trigger(`${NAME}::${eventType}`, data);
+    this.$element.trigger(`${NAMESPACE}::${eventType}`, data);
 
     // callback
     eventType = eventType.replace(/\b\w+\b/g, (word) => {
@@ -189,7 +189,7 @@ class asBreadcrumbs {
     let onFunction = `on${eventType}`;
 
     if (typeof this.options[onFunction] === 'function') {
-      this.options[onFunction].apply(this, ...params);
+      this.options[onFunction].apply(this, params);
     }
   }
 
@@ -271,7 +271,7 @@ class asBreadcrumbs {
 
     this.initialized = false;
 
-    this.$element.data(NAME, null);
+    this.$element.data(NAMESPACE, null);
     $(window).off(this.eventNameWithId('resize'));
     this._trigger('destroy');
   }

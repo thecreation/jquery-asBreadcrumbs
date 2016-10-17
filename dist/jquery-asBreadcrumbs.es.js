@@ -1,5 +1,5 @@
 /**
-* jQuery asBreadcrumbs v0.2.1
+* jQuery asBreadcrumbs v0.2.2
 * https://github.com/amazingSurge/jquery-asBreadcrumbs
 *
 * Copyright (c) amazingSurge
@@ -67,7 +67,7 @@ var DEFAULTS = {
   onReady: null
 };
 
-const NAME$1 = 'asBreadcrumbs';
+const NAMESPACE = 'asBreadcrumbs';
 let instanceId = 0;
 
 /**
@@ -194,7 +194,7 @@ class asBreadcrumbs {
       childrenWidthTotal += this.items[i].outerWidth;
 
       if (childrenWidthTotal + dropdownWidth > containerWidth) {
-        showDropdown = true
+        showDropdown = true;
         this._showDropdownItem(i);
       } else {
         this._hideDropdownItem(i);
@@ -243,10 +243,10 @@ class asBreadcrumbs {
   }
 
   _trigger(eventType, ...params) {
-    let data = [this].concat(...params);
+    let data = [this].concat(params);
 
     // event
-    this.$element.trigger(`${NAME$1}::${eventType}`, data);
+    this.$element.trigger(`${NAMESPACE}::${eventType}`, data);
 
     // callback
     eventType = eventType.replace(/\b\w+\b/g, (word) => {
@@ -255,7 +255,7 @@ class asBreadcrumbs {
     let onFunction = `on${eventType}`;
 
     if (typeof this.options[onFunction] === 'function') {
-      this.options[onFunction].apply(this, ...params);
+      this.options[onFunction].apply(this, params);
     }
   }
 
@@ -337,7 +337,7 @@ class asBreadcrumbs {
 
     this.initialized = false;
 
-    this.$element.data(NAME$1, null);
+    this.$element.data(NAMESPACE, null);
     $(window).off(this.eventNameWithId('resize'));
     this._trigger('destroy');
   }
@@ -348,7 +348,7 @@ class asBreadcrumbs {
 }
 
 var info = {
-  version:'0.2.1'
+  version:'0.2.2'
 };
 
 const NAME = 'asBreadcrumbs';

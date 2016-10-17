@@ -1,5 +1,5 @@
 /**
-* jQuery asBreadcrumbs v0.2.1
+* jQuery asBreadcrumbs v0.2.2
 * https://github.com/amazingSurge/jquery-asBreadcrumbs
 *
 * Copyright (c) amazingSurge
@@ -38,7 +38,7 @@
       :
 
       function(obj) {
-        return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
       };
 
     function _classCallCheck(instance, Constructor) {
@@ -128,7 +128,7 @@
       onReady: null
     };
 
-    var NAME$1 = 'asBreadcrumbs';
+    var NAMESPACE = 'asBreadcrumbs';
     var instanceId = 0;
 
     /**
@@ -333,16 +333,14 @@
       }, {
         key: '_trigger',
         value: function _trigger(eventType) {
-          var _ref;
-
           for (var _len = arguments.length, params = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
             params[_key - 1] = arguments[_key];
           }
 
-          var data = (_ref = [this]).concat.apply(_ref, params);
+          var data = [this].concat(params);
 
           // event
-          this.$element.trigger(NAME$1 + '::' + eventType, data);
+          this.$element.trigger(NAMESPACE + '::' + eventType, data);
 
           // callback
           eventType = eventType.replace(/\b\w+\b/g,
@@ -354,9 +352,7 @@
           var onFunction = 'on' + eventType;
 
           if (typeof this.options[onFunction] === 'function') {
-            var _options$onFunction;
-
-            (_options$onFunction = this.options[onFunction]).apply.apply(_options$onFunction, [this].concat(params));
+            this.options[onFunction].apply(this, params);
           }
         }
       }, {
@@ -461,7 +457,7 @@
 
           this.initialized = false;
 
-          this.$element.data(NAME$1, null);
+          this.$element.data(NAMESPACE, null);
           (0, _jquery2.default)(window).off(this.eventNameWithId('resize'));
           this._trigger('destroy');
         }
@@ -476,7 +472,7 @@
     }();
 
     var info = {
-      version: '0.2.1'
+      version: '0.2.2'
     };
 
     var NAME = 'asBreadcrumbs';
