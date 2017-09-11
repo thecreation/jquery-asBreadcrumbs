@@ -1,5 +1,5 @@
 /**
-* jQuery asBreadcrumbs v0.2.2
+* jQuery asBreadcrumbs v0.2.3
 * https://github.com/amazingSurge/jquery-asBreadcrumbs
 *
 * Copyright (c) amazingSurge
@@ -274,7 +274,7 @@ class asBreadcrumbs {
 
   eventNameWithId(events) {
     if (typeof events !== 'string' || events === '') {
-      return `${this.options.namespace}-${this.instanceId}`;
+      return `.${this.options.namespace}-${this.instanceId}`;
     }
 
     events = events.split(' ');
@@ -348,7 +348,7 @@ class asBreadcrumbs {
 }
 
 var info = {
-  version:'0.2.2'
+  version:'0.2.3'
 };
 
 const NAME = 'asBreadcrumbs';

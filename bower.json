@@ -1,6 +1,6 @@
 {
   "name": "jquery-asBreadcrumbs",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A jquery plugin that make bootstrap breadcrumbs responisve.",
   "main": "dist/jquery-asBreadcrumbs.js",
   "copyright": "amazingSurge",
