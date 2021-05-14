@@ -246,7 +246,7 @@
                 that.options.dropdownItem.call(
                   that,
                   that.classes,
-                  $this.text(),
+                  $this.html(),
                   $link.attr('href')
                 )
               );
