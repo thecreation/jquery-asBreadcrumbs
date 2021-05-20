@@ -70,7 +70,7 @@ class asBreadcrumbs {
     this.$children.each(function(){
       const $this = $(this);
       const $link = that.options.getItemLink($this);
-      const $dropdownItem = $(that.options.dropdownItem.call(that, that.classes, $this.text(), $link.attr('href')));
+      const $dropdownItem = $(that.options.dropdownItem.call(that, that.classes, $this.html(), $link.attr('href')));
 
       that.items.push({
         $this,
